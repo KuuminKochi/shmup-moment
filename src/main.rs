@@ -1,6 +1,8 @@
 use bevy::{prelude::*, time::FixedTimestep};
 
 // GAME CONSTANT
+const SCREEN_WIDTH: f32 = 640.;
+const SCREEN_HEIGHT: f32 = 480.;
 const TIME_STEP: f32 = 1.0 / 60.0;
 
 // PLAYER
@@ -8,14 +10,13 @@ const PLAYER_COLOUR: Color = Color::rgb(255., 23., 23.);
 const PLAYER_WIDTH: f32 = 25.;
 const PLAYER_HEIGHT: f32 = 25.;
 const PLAYER_SPEED: f32 = 500.;
-
-// PLAYER CONTROL
 const FOCUS_SCALE: f32 = 2.;
 
 // BULLET
 const BULLET_COLOUR: Color = Color::rgb(0.0, 0.0, 255.);
-const BULLET_WIDTH: f32 = 2.;
-const BULLET_HEIGHT: f32 = 2.;
+const PLAYER_BULLET_COOLDOWN: f32 = 0.3;
+const BULLET_WIDTH: f32 = 20.;
+const BULLET_HEIGHT: f32 = 20.;
 const BULLET_SPEED: f32 = 600.;
 
 // COMPONENTS
@@ -30,21 +31,25 @@ struct PlayerStatus {
 }
 
 #[derive(Component)]
-struct Bullet;
+struct PlayerBullet;
+
+#[derive(Component)]
+struct BulletTimer(Timer);
 
 fn main() {
     App::new()
+        .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
         .add_startup_system(access_window_system)
+        .add_startup_system(player_spawn)
         .add_system_set(
             SystemSet::new()
                 .with_run_criteria(FixedTimestep::step(TIME_STEP as f64))
                 .with_system(player_control)
-                .with_system(bullet_spawn)
-                .with_system(bullet_move),
+                .with_system(player_bullet_spawn)
+                .with_system(player_bullet_move)
         )
-        .add_startup_system(player_spawn)
-        .add_plugins(DefaultPlugins)
+        .insert_resource(BulletTimer(Timer::from_seconds(PLAYER_BULLET_COOLDOWN, true)))
         .run();
 }
 
@@ -56,8 +61,14 @@ fn setup(mut commands: Commands) {
 fn access_window_system(mut windows: ResMut<Windows>) {
     for window in windows.iter_mut() {
         window.set_title(String::from("Touhou Fangame"));
-        window.set_resolution(620., 480.);
+        window.set_resolution(SCREEN_WIDTH, SCREEN_HEIGHT);
         window.set_resizable(false);
+    }
+}
+
+fn teardown(mut commands: Commands, entities: Query<Entity, Without<Camera>>) {
+    for entity in &entities {
+        commands.entity(entity).despawn_recursive();
     }
 }
 
@@ -111,6 +122,8 @@ fn player_control(
             direction_vertical += 1.0;
         }
 
+
+
         if keyboard_input.pressed(KeyCode::LShift) {
             player_status.is_focus = true;
         }
@@ -134,34 +147,42 @@ fn player_control(
     }
 }
 
-fn bullet_spawn(
+fn player_bullet_spawn(
     mut commands: Commands,
-    player_state: Query<&PlayerStatus, With<Player>>
-    ) {
-    let player_status = player_state.single();
+    player_state: Query<(&Transform, &PlayerStatus), With<Player>>,
+    time: Res<Time>,
+    mut timer: ResMut<BulletTimer>
+    )
+ {
 
-    if player_status.is_shoot == true {
-        commands
-            .spawn()
-            .insert_bundle(SpriteBundle {
-                sprite: Sprite {
-                    color: BULLET_COLOUR,
+
+    for (player_position, player_status) in player_state.iter() {
+        if player_status.is_shoot == true && timer.0.tick(time.delta()).finished(){
+            commands
+                .spawn()
+                .insert_bundle(SpriteBundle {
+                    sprite: Sprite {
+                        color: BULLET_COLOUR,
+                        ..default()
+                    },
+                    transform: Transform {
+                        translation: Vec3::new(
+                            player_position.translation.x,
+                            player_position.translation.y + 10.0,
+                            0.,
+                        ),
+                        scale: Vec3::new(BULLET_WIDTH, BULLET_HEIGHT, 0.),
+                        ..default()
+                    },
                     ..default()
-                },
-                transform: Transform {
-                    translation: Vec3::new(0., 0., 0.),
-                    scale: Vec3::new(BULLET_WIDTH, BULLET_HEIGHT, 0.),
-                    ..default()
-                },
-                ..default()
-            })
-            .insert(Bullet);
+                })
+                .insert(PlayerBullet);
+        }
     }
 }
 
-fn bullet_move(
-    mut bullet_state: Query<&mut Transform, With<Bullet>>,
-    ) {
-    let mut bullet_position = bullet_state.single_mut();
-        bullet_position.translation.y += BULLET_SPEED;
+fn player_bullet_move(mut bullet_state: Query<&mut Transform, With<PlayerBullet>>) {
+    for mut bullet_position in bullet_state.iter_mut() {
+        bullet_position.translation.y += BULLET_SPEED * TIME_STEP ;
+    }
 }
