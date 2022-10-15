@@ -10,6 +10,7 @@ const PLAYER_HEIGHT: f32 = 25.;
 const PLAYER_SPEED: f32 = 500.;
 
 // PLAYER CONTROL
+
 const FOCUS_SCALE: f32 = 2.;
 
 // COMPONENTS
@@ -80,7 +81,7 @@ fn player_control(
     for (mut player_transform, mut player_status) in player_state.iter_mut() {
         let mut direction_horizontal = 0.0;
         let mut direction_vertical = 0.0;
-
+        
         player_status.is_focus = false;
 
         if keyboard_input.pressed(KeyCode::Left) {
@@ -102,7 +103,7 @@ fn player_control(
         if keyboard_input.pressed(KeyCode::LShift) {
             player_status.is_focus = true;
         }
-
+        
         if player_status.is_focus == true {
             direction_vertical = direction_vertical / FOCUS_SCALE;
             direction_horizontal = direction_horizontal / FOCUS_SCALE;
