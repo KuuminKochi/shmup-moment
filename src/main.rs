@@ -10,8 +10,13 @@ const PLAYER_HEIGHT: f32 = 25.;
 const PLAYER_SPEED: f32 = 500.;
 
 // PLAYER CONTROL
-
 const FOCUS_SCALE: f32 = 2.;
+
+// BULLET
+const BULLET_COLOUR: Color = Color::rgb(0.0, 0.0, 255.);
+const BULLET_WIDTH: f32 = 2.;
+const BULLET_HEIGHT: f32 = 2.;
+const BULLET_SPEED: f32 = 600.;
 
 // COMPONENTS
 #[derive(Component)]
@@ -24,6 +29,9 @@ struct PlayerStatus {
     is_focus: bool,
 }
 
+#[derive(Component)]
+struct Bullet;
+
 fn main() {
     App::new()
         .add_startup_system(setup)
@@ -31,7 +39,9 @@ fn main() {
         .add_system_set(
             SystemSet::new()
                 .with_run_criteria(FixedTimestep::step(TIME_STEP as f64))
-                .with_system(player_control),
+                .with_system(player_control)
+                .with_system(bullet_spawn)
+                .with_system(bullet_move),
         )
         .add_startup_system(player_spawn)
         .add_plugins(DefaultPlugins)
@@ -81,8 +91,9 @@ fn player_control(
     for (mut player_transform, mut player_status) in player_state.iter_mut() {
         let mut direction_horizontal = 0.0;
         let mut direction_vertical = 0.0;
-        
+
         player_status.is_focus = false;
+        player_status.is_shoot = false;
 
         if keyboard_input.pressed(KeyCode::Left) {
             direction_horizontal -= 1.0;
@@ -103,13 +114,16 @@ fn player_control(
         if keyboard_input.pressed(KeyCode::LShift) {
             player_status.is_focus = true;
         }
-        
+
+        if keyboard_input.pressed(KeyCode::Z) {
+            player_status.is_shoot = true;
+        }
+
         if player_status.is_focus == true {
             direction_vertical = direction_vertical / FOCUS_SCALE;
             direction_horizontal = direction_horizontal / FOCUS_SCALE;
         }
 
-        // Calculate the new horizontal paddle position based on player input
         let new_player_x_position =
             player_transform.translation.x + direction_horizontal * PLAYER_SPEED * TIME_STEP;
         let new_player_y_position =
@@ -118,4 +132,36 @@ fn player_control(
         player_transform.translation.x = new_player_x_position;
         player_transform.translation.y = new_player_y_position;
     }
+}
+
+fn bullet_spawn(
+    mut commands: Commands,
+    player_state: Query<&PlayerStatus, With<Player>>
+    ) {
+    let player_status = player_state.single();
+
+    if player_status.is_shoot == true {
+        commands
+            .spawn()
+            .insert_bundle(SpriteBundle {
+                sprite: Sprite {
+                    color: BULLET_COLOUR,
+                    ..default()
+                },
+                transform: Transform {
+                    translation: Vec3::new(0., 0., 0.),
+                    scale: Vec3::new(BULLET_WIDTH, BULLET_HEIGHT, 0.),
+                    ..default()
+                },
+                ..default()
+            })
+            .insert(Bullet);
+    }
+}
+
+fn bullet_move(
+    mut bullet_state: Query<&mut Transform, With<Bullet>>,
+    ) {
+    let mut bullet_position = bullet_state.single_mut();
+        bullet_position.translation.y += BULLET_SPEED;
 }
