@@ -1,4 +1,8 @@
-use bevy::{prelude::*, time::FixedTimestep};
+use bevy::{
+    prelude::*,
+    time::FixedTimestep,
+    sprite::collide_aabb::{collide, Collision},
+};
 
 // GAME CONSTANT
 const SCREEN_WIDTH: f32 = 640.;
@@ -19,6 +23,11 @@ const BULLET_WIDTH: f32 = 20.;
 const BULLET_HEIGHT: f32 = 20.;
 const BULLET_SPEED: f32 = 600.;
 
+// ENEMY
+const ENEMY_COLOUR: Color = Color::rgb(0.0, 255., 255.);
+const ENEMY_WIDTH: f32 = 20.;
+const ENEMY_HEIGHT: f32 = 20.;
+
 // COMPONENTS
 #[derive(Component)]
 struct Player;
@@ -36,6 +45,21 @@ struct PlayerBullet;
 #[derive(Component)]
 struct BulletTimer(Timer);
 
+#[derive(Component)]
+struct Enemy;
+
+#[derive(Component)]
+struct EnemyStatus {
+    is_dead: bool,
+    is_shoot: bool,
+}
+
+#[derive(Component)]
+struct Collider;
+
+#[derive(Default)]
+struct CollisionEvent;
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
@@ -48,6 +72,8 @@ fn main() {
                 .with_system(player_control)
                 .with_system(player_bullet_spawn)
                 .with_system(player_bullet_move)
+                .with_system(enemy_spawn)
+       //         .with_system(check_for_collisions)
         )
         .insert_resource(BulletTimer(Timer::from_seconds(PLAYER_BULLET_COOLDOWN, true)))
         .run();
@@ -88,6 +114,7 @@ fn player_spawn(mut commands: Commands) {
             ..default()
         })
         .insert(Player)
+        .insert(Collider)
         .insert(PlayerStatus {
             is_dead: false,
             is_shoot: false,
@@ -152,10 +179,7 @@ fn player_bullet_spawn(
     player_state: Query<(&Transform, &PlayerStatus), With<Player>>,
     time: Res<Time>,
     mut timer: ResMut<BulletTimer>
-    )
- {
-
-
+    ) {
     for (player_position, player_status) in player_state.iter() {
         if player_status.is_shoot == true && timer.0.tick(time.delta()).finished(){
             commands
@@ -176,7 +200,8 @@ fn player_bullet_spawn(
                     },
                     ..default()
                 })
-                .insert(PlayerBullet);
+                .insert(PlayerBullet)
+                .insert(Collider);
         }
     }
 }
@@ -186,3 +211,75 @@ fn player_bullet_move(mut bullet_state: Query<&mut Transform, With<PlayerBullet>
         bullet_position.translation.y += BULLET_SPEED * TIME_STEP ;
     }
 }
+
+fn enemy_spawn(
+    mut commands: Commands
+    ) {
+            commands
+                .spawn()
+                .insert_bundle(SpriteBundle {
+                    sprite: Sprite {
+                        color: ENEMY_COLOUR,
+                        ..default()
+                    },
+                    transform: Transform {
+                        translation: Vec3::new(
+                            0.,
+                            0.,
+                            0.,
+                        ),
+                        scale: Vec3::new(ENEMY_WIDTH, ENEMY_HEIGHT, 0.),
+                        ..default()
+                    },
+                    ..default()
+                })
+                .insert(Enemy)
+                .insert(Collider)
+                .insert(EnemyStatus {
+                    is_dead: false,
+                    is_shoot: false,
+                });
+}
+
+//fn check_for_collisions(
+//    mut commands: Commands,
+//    mut player_state: Query<(&Transform, &mut PlayerStatus), With<Player>>,
+//    // mut player_bullet_state: Query<&Transform, With<PlayerBullet>>,
+//    collider_query: Query<(Entity, &Transform, Option<&Player>), With<Collider>>,
+//    mut collision_events: EventWriter<CollisionEvent>,
+//) {
+//    let (player_transform, mut player_status) = player_state.single_mut();
+//    let player_size = player_transform.scale.truncate();
+//
+//    // check collision with walls
+//    for (collider_entity, transform, player_entity) in &collider_query {
+//        let collision = collide(
+//            player_transform.translation,
+//            player_size,
+//            transform.translation,
+//            transform.scale.truncate(),
+//        );
+//
+//        if let Some(collision) = collision {
+//            // Sends a collision event so that other systems can react to the collision
+//            collision_events.send_default();
+//            
+//            if player_entity.is_some() {
+//                commands.entity(collider_entity).despawn();
+//            }
+//
+//            match collision {
+//                Collision::Left => {},
+//                Collision::Right => {},
+//                Collision::Top => {},
+//                Collision::Bottom => {},
+//                Collision::Inside => {
+//                    player_status.is_dead = true;
+//                    println!("{:?}", player_status.is_dead)
+//                }
+//            }
+//
+//        }
+//    }
+//}
+
