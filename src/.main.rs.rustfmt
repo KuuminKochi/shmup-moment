@@ -1,7 +1,7 @@
 use bevy::{
     prelude::*,
-    sprite::collide_aabb::{collide, Collision},
     time::FixedTimestep,
+    sprite::collide_aabb::{collide, Collision},
 };
 
 // GAME CONSTANT
@@ -74,13 +74,10 @@ fn main() {
                 .with_system(player_bullet_move)
                 .with_system(enemy_spawn)
                 .with_system(enemy_move)
-                .with_system(check_for_collisions),
+                .with_system(check_for_collisions)
         )
         .add_event::<CollisionEvent>()
-        .insert_resource(BulletTimer(Timer::from_seconds(
-            PLAYER_BULLET_COOLDOWN,
-            true,
-        )))
+        .insert_resource(BulletTimer(Timer::from_seconds(PLAYER_BULLET_COOLDOWN, true)))
         .run();
 }
 
@@ -154,6 +151,8 @@ fn player_control(
             direction_vertical += 1.0;
         }
 
+
+
         if keyboard_input.pressed(KeyCode::LShift) {
             player_status.is_focus = true;
         }
@@ -181,10 +180,10 @@ fn player_bullet_spawn(
     mut commands: Commands,
     player_state: Query<(&Transform, &PlayerStatus), With<Player>>,
     time: Res<Time>,
-    mut timer: ResMut<BulletTimer>,
-) {
+    mut timer: ResMut<BulletTimer>
+    ) {
     for (player_position, player_status) in player_state.iter() {
-        if player_status.is_shoot == true && timer.0.tick(time.delta()).just_finished() {
+        if player_status.is_shoot == true && timer.0.tick(time.delta()).finished(){
             commands
                 .spawn()
                 .insert_bundle(SpriteBundle {
@@ -205,42 +204,49 @@ fn player_bullet_spawn(
                 })
                 .insert(PlayerBullet)
                 .insert(Collider);
-
-            timer.0.reset();
         }
     }
 }
 
 fn player_bullet_move(mut bullet_state: Query<&mut Transform, With<PlayerBullet>>) {
     for mut bullet_position in bullet_state.iter_mut() {
-        bullet_position.translation.y += BULLET_SPEED * TIME_STEP;
+        bullet_position.translation.y += BULLET_SPEED * TIME_STEP ;
     }
 }
 
-fn enemy_spawn(mut commands: Commands) {
-    commands
-        .spawn()
-        .insert_bundle(SpriteBundle {
-            sprite: Sprite {
-                color: ENEMY_COLOUR,
-                ..default()
-            },
-            transform: Transform {
-                translation: Vec3::new(100., 0., 0.),
-                scale: Vec3::new(ENEMY_WIDTH, ENEMY_HEIGHT, 0.),
-                ..default()
-            },
-            ..default()
-        })
-        .insert(Enemy)
-        .insert(Collider)
-        .insert(EnemyStatus {
-            is_dead: false,
-            is_shoot: false,
-        });
+fn enemy_spawn(
+    mut commands: Commands
+    ) {
+            commands
+                .spawn()
+                .insert_bundle(SpriteBundle {
+                    sprite: Sprite {
+                        color: ENEMY_COLOUR,
+                        ..default()
+                    },
+                    transform: Transform {
+                        translation: Vec3::new(
+                            100.,
+                            0.,
+                            0.,
+                        ),
+                        scale: Vec3::new(ENEMY_WIDTH, ENEMY_HEIGHT, 0.),
+                        ..default()
+                    },
+                    ..default()
+                })
+                .insert(Enemy)
+                .insert(Collider)
+                .insert(EnemyStatus {
+                    is_dead: false,
+                    is_shoot: false,
+                });
 }
 
-fn enemy_move(mut enemy_query: Query<&mut Transform, With<Enemy>>) {
+fn enemy_move (
+    mut enemy_query: Query<&mut Transform, With<Enemy>>
+    ) {
+    
     for mut enemy_transform in enemy_query.iter_mut() {
         enemy_transform.translation.x += 1.;
         enemy_transform.translation.y = 0.0;
@@ -249,31 +255,28 @@ fn enemy_move(mut enemy_query: Query<&mut Transform, With<Enemy>>) {
 
 fn check_for_collisions(
     mut commands: Commands,
-    player_bullet_query: Query<(Entity, &Transform), With<PlayerBullet>>,
-    enemy_query: Query<(Entity, &Transform), With<Enemy>>,
-) {
-    for (bullet_entity, player_bullet_transform) in player_bullet_query.iter() {
-        for (enemy_entity, enemy_transform) in enemy_query.iter() {
-            
+    player_bullet_query: Query<&Transform, With<PlayerBullet>>,
+    enemy_query: Query<&Transform, With<Enemy>>,
+    ) {
+    
+    for player_bullet_transform in player_bullet_query.iter() {
+        for enemy_transform in enemy_query.iter() {
             let collision = collide(
-                player_bullet_transform.translation,
-                player_bullet_transform.scale.truncate(),
-                enemy_transform.translation,
-                enemy_transform.scale.truncate(),
-            );
-
-            if let Some(collision) = collision {
-                match collision {
-                    Collision::Left => {}
-                    Collision::Right => {}
-                    Collision::Top => {}
-                    Collision::Bottom => {}
-                    Collision::Inside => { 
-                        commands.entity(enemy_entity).despawn();
-                        commands.entity(bullet_entity).despawn();
-                    }
-                };
-            }
+            player_bullet_transform.translation,
+            player_bullet_transform.scale.truncate(),
+            enemy_transform.translation,
+            enemy_transform.scale.truncate(),
+        );
+        if let Some(collision) = collision {
+            match collision {
+                Collision::Left => {},
+                Collision::Right => {},
+                Collision::Top => {},
+                Collision::Bottom => {},
+                Collision::Inside => { /* do nothing */ }
+            };
+        }
         }
     }
 }
+
