@@ -1,8 +1,12 @@
+// use external library
 use bevy::{
     prelude::*,
     sprite::collide_aabb::{collide, Collision},
     time::FixedTimestep,
 };
+
+// mods
+mod collision;
 
 // GAME CONSTANT
 const SCREEN_WIDTH: f32 = 640.;
