@@ -7,6 +7,7 @@ use bevy::{
 
 // mods
 mod collision;
+mod controls;
 
 // GAME CONSTANT
 const SCREEN_WIDTH: f32 = 640.;

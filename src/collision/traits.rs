@@ -8,4 +8,5 @@ pub trait Collider {
     fn collision_with_circle(&self, shp1: Vec<f32>, tl0: Vec3, tl1: Vec3) -> bool;
     fn collision_with_box(&self, shp1: Vec<f32>, tl0: Vec3, tl1: Vec3) -> bool;
     fn get_mask(&self) -> CollisionMask;
+    fn get_collision_mask(&self) -> CollisionMask;
 }
