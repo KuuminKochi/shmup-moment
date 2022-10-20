@@ -1,5 +1,8 @@
 use bevy::prelude::*;
 
+pub mod resources;
+pub mod systems;
+
 pub struct ControlsPlugin;
 
 impl Plugin for ControlsPlugin {
