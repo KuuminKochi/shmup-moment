@@ -30,6 +30,13 @@ const ENEMY_HEIGHT: f32 = 2.;
 
 // COMPONENTS
 #[derive(Component)]
+enum WorldChapters {
+    One,
+    Two,
+    Three,
+}
+
+#[derive(Component)]
 struct Player;
 
 #[derive(Component)]
@@ -53,6 +60,9 @@ struct EnemyStatus {
     is_dead: bool,
     is_shoot: bool,
 }
+
+
+
 
 #[derive(Component)]
 struct Collider;
@@ -241,10 +251,14 @@ fn enemy_spawn(mut commands: Commands) {
 }
 
 fn enemy_move(mut enemy_query: Query<&mut Transform, With<Enemy>>) {
-    for mut enemy_transform in enemy_query.iter_mut() {
-        enemy_transform.translation.x += 1.;
-        enemy_transform.translation.y = 0.0;
-    }
+    
+    let chapter = WorldChapters::One;
+
+    match chapter {
+        WorldChapters::One => {},
+        WorldChapters::Two => {},
+        WorldChapters::Three => {},
+    };
 }
 
 fn check_for_collisions(
