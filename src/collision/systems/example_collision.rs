@@ -14,3 +14,4 @@ fn test_collision_system<T: Collider + Component, U: Collider + Component>(
         }
     }
 }
+

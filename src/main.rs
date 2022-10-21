@@ -7,6 +7,7 @@ use bevy::{
 
 // mods
 mod collision;
+mod controls;
 
 // COMPONENTS
 
