@@ -8,36 +8,20 @@ use bevy::{
 // mods
 mod collision;
 
-// GAME CONSTANT
-const SCREEN_WIDTH: f32 = 640.;
-const SCREEN_HEIGHT: f32 = 480.;
-const TIME_STEP: f32 = 1.0 / 60.0;
-
-// PLAYER
-const PLAYER_COLOUR: Color = Color::rgb(255., 23., 23.);
-const PLAYER_WIDTH: f32 = 25.;
-const PLAYER_HEIGHT: f32 = 25.;
-const PLAYER_SPEED: f32 = 500.;
-const FOCUS_SCALE: f32 = 2.;
-
-// BULLET
-const BULLET_COLOUR: Color = Color::rgb(0.0, 0.0, 255.);
-const PLAYER_BULLET_COOLDOWN: f32 = 0.3;
-const BULLET_WIDTH: f32 = 20.;
-const BULLET_HEIGHT: f32 = 20.;
-const BULLET_SPEED: f32 = 600.;
-
-// ENEMY
-const ENEMY_COLOUR: Color = Color::rgb(0.0, 255., 255.);
-const ENEMY_WIDTH: f32 = 2.;
-const ENEMY_HEIGHT: f32 = 2.;
-
 // COMPONENTS
+
 #[derive(Component)]
-enum WorldChapters {
-    One,
-    Two,
-    Three,
+enum Spellblocks {
+    Circle,
+}
+
+impl Spellblocks {
+    fn circle(
+        commands: Commands,
+        enemy_query: Query<&Transform, With<Enemy>>,
+        ){
+        
+    }
 }
 
 #[derive(Component)]
@@ -65,14 +49,39 @@ struct EnemyStatus {
     is_shoot: bool,
 }
 
-
-
+#[derive(Component)]
+struct EnemyBullet;
 
 #[derive(Component)]
 struct Collider;
 
 #[derive(Default)]
 struct CollisionEvent;
+
+
+// GAME CONSTANT
+const SCREEN_WIDTH: f32 = 640.;
+const SCREEN_HEIGHT: f32 = 480.;
+const TIME_STEP: f32 = 1.0 / 60.0;
+
+// PLAYER
+const PLAYER_COLOUR: Color = Color::rgb(255., 23., 23.);
+const PLAYER_WIDTH: f32 = 25.;
+const PLAYER_HEIGHT: f32 = 25.;
+const PLAYER_SPEED: f32 = 500.;
+const FOCUS_SCALE: f32 = 2.;
+
+// BULLET
+const BULLET_COLOUR: Color = Color::rgb(0.0, 0.0, 255.);
+const PLAYER_BULLET_COOLDOWN: f32 = 0.3;
+const BULLET_WIDTH: f32 = 20.;
+const BULLET_HEIGHT: f32 = 20.;
+const BULLET_SPEED: f32 = 600.;
+
+// ENEMY
+const ENEMY_COLOUR: Color = Color::rgb(0.0, 255., 255.);
+const ENEMY_WIDTH: f32 = 2.;
+const ENEMY_HEIGHT: f32 = 2.;
 
 fn main() {
     App::new()
@@ -87,8 +96,8 @@ fn main() {
                 .with_system(player_bullet_spawn)
                 .with_system(player_bullet_move)
                 .with_system(enemy_spawn)
-                .with_system(enemy_move)
-                .with_system(check_for_collisions),
+                .with_system(check_for_collisions)
+                .with_system(enemy_bullet_spawn)
         )
         .add_event::<CollisionEvent>()
         .insert_resource(BulletTimer(Timer::from_seconds(
@@ -199,10 +208,7 @@ fn player_bullet_spawn(
 ) {
     for (player_position, player_status) in player_state.iter() {
         if player_status.is_shoot == true && timer.0.tick(time.delta()).just_finished() {
-            commands
-                .spawn()
-                .insert_bundle(SpriteBundle {
-                    sprite: Sprite {
+            commands .spawn() .insert_bundle(SpriteBundle { sprite: Sprite {
                         color: BULLET_COLOUR,
                         ..default()
                     },
@@ -254,17 +260,6 @@ fn enemy_spawn(mut commands: Commands) {
         });
 }
 
-fn enemy_move(mut enemy_query: Query<&mut Transform, With<Enemy>>) {
-    
-    let chapter = WorldChapters::One;
-
-    match chapter {
-        WorldChapters::One => {},
-        WorldChapters::Two => {},
-        WorldChapters::Three => {},
-    };
-}
-
 fn check_for_collisions(
     mut commands: Commands,
     player_bullet_query: Query<(Entity, &Transform), With<PlayerBullet>>,
@@ -295,3 +290,30 @@ fn check_for_collisions(
         }
     }
 }
+
+fn enemy_bullet_spawn (
+    mut commands: Commands,
+    enemy_query: Query<&Transform, With<Enemy>>,
+    ) {
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
