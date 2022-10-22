@@ -1,12 +1,11 @@
-
 //use crate::{game_flow::GameState, PIXEL2UNIT_MULTIPLIER};
 use bevy::{prelude::*, sprite::collide_aabb::collide};
 //use iyes_loopless::prelude::*;
 
-pub mod components;
-pub mod traits;
 pub mod colliders;
+pub mod components;
 pub mod systems;
+pub mod traits;
 
 pub struct CollisionPlugin;
 
@@ -19,7 +18,5 @@ impl Plugin for CollisionPlugin {
         //         .with_system(test_collision_system::<BoxCollider, CircleCollider>)
         //         .into(),
         // );
-
-
     }
 }

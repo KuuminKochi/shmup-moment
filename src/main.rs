@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 // use external library
 use bevy::{
     prelude::*,
@@ -10,20 +12,6 @@ mod collision;
 mod controls;
 
 // COMPONENTS
-
-#[derive(Component)]
-enum Spellblocks {
-    Circle,
-}
-
-impl Spellblocks {
-    fn circle(
-        commands: Commands,
-        enemy_query: Query<&Transform, With<Enemy>>,
-        ){
-        
-    }
-}
 
 #[derive(Component)]
 struct Player;
@@ -58,7 +46,6 @@ struct Collider;
 
 #[derive(Default)]
 struct CollisionEvent;
-
 
 // GAME CONSTANT
 const SCREEN_WIDTH: f32 = 640.;
@@ -98,7 +85,7 @@ fn main() {
                 .with_system(player_bullet_move)
                 .with_system(enemy_spawn)
                 .with_system(check_for_collisions)
-                .with_system(enemy_bullet_spawn)
+                .with_system(enemy_bullet_spawn),
         )
         .add_event::<CollisionEvent>()
         .insert_resource(BulletTimer(Timer::from_seconds(
@@ -209,7 +196,10 @@ fn player_bullet_spawn(
 ) {
     for (player_position, player_status) in player_state.iter() {
         if player_status.is_shoot == true && timer.0.tick(time.delta()).just_finished() {
-            commands .spawn() .insert_bundle(SpriteBundle { sprite: Sprite {
+            commands
+                .spawn()
+                .insert_bundle(SpriteBundle {
+                    sprite: Sprite {
                         color: BULLET_COLOUR,
                         ..default()
                     },
@@ -268,7 +258,6 @@ fn check_for_collisions(
 ) {
     for (bullet_entity, player_bullet_transform) in player_bullet_query.iter() {
         for (enemy_entity, enemy_transform) in enemy_query.iter() {
-            
             let collision = collide(
                 player_bullet_transform.translation,
                 player_bullet_transform.scale.truncate(),
@@ -282,7 +271,7 @@ fn check_for_collisions(
                     Collision::Right => {}
                     Collision::Top => {}
                     Collision::Bottom => {}
-                    Collision::Inside => { 
+                    Collision::Inside => {
                         commands.entity(enemy_entity).despawn();
                         commands.entity(bullet_entity).despawn();
                     }
@@ -292,29 +281,42 @@ fn check_for_collisions(
     }
 }
 
-fn enemy_bullet_spawn (
+fn enemy_bullet_spawn(
     mut commands: Commands,
-    enemy_query: Query<&Transform, With<Enemy>>,
-    ) {
+    enemy_query: Query<(&Transform, &EnemyStatus), With<Enemy>>,
+) {
+    // make the x and y axis of the bullet shoot in a cosine or sine wave pattern, no need for
+    // circles
+    for (enemy_transform, enemy_status) in enemy_query.iter() {
+        let total_bullet_array: f32 = 1.;
+        let bullet_per_array: f32 = 1.;
+        let starting_angle: f32 = 1.;
+        let spin_rate: f32 = 0.0;
+        let spin_modifier: f32 = 0.0;
+        let fire_rate: f32 = 0.0;
+        let bullet_curve: f32 = f32::powf(1.0, 2.0);
+        let x_offset = 0.0;
+        let y_offset = 0.0;
 
+        let bullet_x = enemy_transform.translation.x * bullet_curve + x_offset;
+        let bullet_y = enemy_transform.translation.y * bullet_curve + y_offset;
+
+        if enemy_status.is_shoot {
+            commands
+                .spawn()
+                .insert_bundle(SpriteBundle {
+                    sprite: Sprite {
+                        color: ENEMY_COLOUR,
+                        ..default()
+                    },
+                    transform: Transform {
+                        translation: Vec3::new(bullet_x, bullet_y, 0.),
+                        scale: Vec3::new(BULLET_WIDTH, BULLET_HEIGHT, 0.),
+                        ..default()
+                    },
+                    ..default()
+                })
+                .insert(EnemyBullet);
+        }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}

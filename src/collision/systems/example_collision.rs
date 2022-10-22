@@ -1,5 +1,5 @@
+use crate::collision::{traits::Collider, *};
 use bevy::prelude::*;
-use crate::collision::{*, traits::Collider};
 
 fn test_collision_system<T: Collider + Component, U: Collider + Component>(
     mut commands: Commands,
@@ -14,4 +14,3 @@ fn test_collision_system<T: Collider + Component, U: Collider + Component>(
         }
     }
 }
-

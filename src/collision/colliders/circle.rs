@@ -1,5 +1,5 @@
+use crate::collision::{components::*, traits::Collider};
 use bevy::{prelude::*, sprite::collide_aabb::collide};
-use crate::collision::{traits::Collider, components::*};
 
 impl Collider for CircleCollider {
     fn get_type(&self) -> ColliderType {
@@ -7,7 +7,9 @@ impl Collider for CircleCollider {
     }
 
     fn collision<T: Collider>(&self, cldr1: &T, tl0: Vec3, tl1: Vec3) -> bool {
-        if self.get_collision_mask() != cldr1.get_mask() { return false }
+        if self.get_collision_mask() != cldr1.get_mask() {
+            return false;
+        }
         match cldr1.get_type() {
             ColliderType::Box => self.collision_with_box(cldr1.get_shape(), tl0, tl1),
             ColliderType::Circle => self.collision_with_circle(cldr1.get_shape(), tl0, tl1),

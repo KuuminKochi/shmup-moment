@@ -21,7 +21,6 @@ pub struct CircleCollider {
     pub collision_mask: CollisionMask,
 }
 
-
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CollisionMask {
     Player,

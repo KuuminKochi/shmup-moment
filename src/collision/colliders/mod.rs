@@ -1,6 +1,6 @@
-use bevy::{prelude::*, sprite::collide_aabb::collide};
 use super::components::*;
 use super::traits::*;
+use bevy::{prelude::*, sprite::collide_aabb::collide};
 
-pub mod rectangle;
 pub mod circle;
+pub mod rectangle;
