@@ -12,11 +12,16 @@ Moved the constants to their own .rs file.
 Still reworking on input parser; don't know if the new way of parsing will work as intended. But we'll see. [Refer to this](#Nt-2022/10/23-Dreamingtown-00).
 Also added this README because i can. Maybe it will be useful
 
-**Lg-2022/10/23-KuuminKochi**
+<a name="Lg-2022/10/23-KuuminKochi-00"></a>
+**Lg-2022/10/23-KuuminKochi-00**
 Working on the enemy bullet generator right now. Will have to reference this a lot:
 https://matthew-brett.github.io/teaching/rotation_2d.html
 While we're on the topic, i'll have to compose a little tune for the game, which I will reserve at a later time.
 Currently, I'm trying to figure out how to make the bullets shoot from all direction. I've already implemented the rotation 2D. It'll be a lil funky if it moves in the x-axis after being spawned
+
+<a name="Lg-2022/10/23-KuuminKochi-01"></a>
+**Lg-2022/10/23-KuuminKochi-01**
+Added collision update, segregated some things like enemy spawning and player bullet spawn. Overall, the code is much cleaner now. drreamingtown is now a femboy
 
 ## Notes
 <a name="Nt-2022/10/23-Dreamingtown-00"></a>
@@ -46,3 +51,4 @@ Content: Infomal, type whatever.
 Example: Nt-2021/04/31-Dream-03
 ### TODOs
 ID: Unique incrementing ID
+
