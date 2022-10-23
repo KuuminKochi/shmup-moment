@@ -53,19 +53,17 @@ pub struct CollisionEvent;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-    //    add_plugin(CollisionPlugin)
+        .add_plugin(CollisionPlugin)
         .add_startup_system(setup)
         .add_startup_system(access_window_system)
         .add_startup_system(player_spawn)
+        .add_startup_system(enemy_spawn)
         .add_system_set(
             SystemSet::new()
                 .with_run_criteria(FixedTimestep::step(TIME_STEP as f64))
                 .with_system(player_control)
                 .with_system(player_bullet_spawn)
                 .with_system(player_bullet_move)
-                .with_system(enemy_spawn)
-                .with_system(check_for_collisions)
-                .with_system(enemy_bullet_spawn),
         )
         .add_event::<CollisionEvent>()
         .insert_resource(BulletTimer(Timer::from_seconds(
@@ -171,37 +169,6 @@ fn player_control(
 fn player_bullet_move(mut bullet_state: Query<&mut Transform, With<PlayerBullet>>) {
     for mut bullet_position in bullet_state.iter_mut() {
         bullet_position.translation.y += BULLET_SPEED * TIME_STEP;
-    }
-}
-
-
-fn check_for_collisions(
-    mut commands: Commands,
-    player_bullet_query: Query<(Entity, &Transform), With<PlayerBullet>>,
-    enemy_query: Query<(Entity, &Transform), With<Enemy>>,
-) {
-    for (bullet_entity, player_bullet_transform) in player_bullet_query.iter() {
-        for (enemy_entity, enemy_transform) in enemy_query.iter() {
-            let collision = collide(
-                player_bullet_transform.translation,
-                player_bullet_transform.scale.truncate(),
-                enemy_transform.translation,
-                enemy_transform.scale.truncate(),
-            );
-
-            if let Some(collision) = collision {
-                match collision {
-                    Collision::Left => {}
-                    Collision::Right => {}
-                    Collision::Top => {}
-                    Collision::Bottom => {}
-                    Collision::Inside => {
-                        commands.entity(enemy_entity).despawn();
-                        commands.entity(bullet_entity).despawn();
-                    }
-                };
-            }
-        }
     }
 }
 

@@ -13,8 +13,9 @@ pub struct CollisionPlugin;
 
 impl Plugin for CollisionPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(player_bullet_enemy)
-            .add_system(enemy_player_bullet);
+        app
+        .add_system(player_bullet_enemy)
+        .add_system(enemy_player_bullet);
         // this is just example with iyes' crates. i forgor their names
         // app.add_system_set(
         //     ConditionSet::new()
