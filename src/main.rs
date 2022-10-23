@@ -1,4 +1,5 @@
 use std::f32::consts::PI;
+use constant::*;
 
 // use external library
 use bevy::{
@@ -10,6 +11,7 @@ use bevy::{
 // mods
 mod collision;
 mod controls;
+pub mod constant;
 
 // COMPONENTS
 
@@ -47,29 +49,7 @@ struct Collider;
 #[derive(Default)]
 struct CollisionEvent;
 
-// GAME CONSTANT
-const SCREEN_WIDTH: f32 = 640.;
-const SCREEN_HEIGHT: f32 = 480.;
-const TIME_STEP: f32 = 1.0 / 60.0;
 
-// PLAYER
-const PLAYER_COLOUR: Color = Color::rgb(255., 23., 23.);
-const PLAYER_WIDTH: f32 = 25.;
-const PLAYER_HEIGHT: f32 = 25.;
-const PLAYER_SPEED: f32 = 500.;
-const FOCUS_SCALE: f32 = 2.;
-
-// BULLET
-const BULLET_COLOUR: Color = Color::rgb(0.0, 0.0, 255.);
-const PLAYER_BULLET_COOLDOWN: f32 = 0.3;
-const BULLET_WIDTH: f32 = 20.;
-const BULLET_HEIGHT: f32 = 20.;
-const BULLET_SPEED: f32 = 600.;
-
-// ENEMY
-const ENEMY_COLOUR: Color = Color::rgb(0.0, 255., 255.);
-const ENEMY_WIDTH: f32 = 2.;
-const ENEMY_HEIGHT: f32 = 2.;
 
 fn main() {
     App::new()

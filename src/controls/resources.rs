@@ -1,4 +1,4 @@
-use bevy::{prelude::KeyCode, utils::HashMap};
+use bevy::{prelude::KeyCode, utils::HashMap, input::{keyboard::KeyboardInput, ButtonState}};
 
 pub struct KeyStateRes(HashMap<KeyCode, KeyState>);
 
@@ -14,35 +14,62 @@ impl Default for KeyState {
 }
 
 impl KeyStateRes {
-    pub fn just_pressed(&self, kc: KeyCode) -> Option<bool> {
+    pub fn just_pressed(&self, kc: KeyCode) -> bool {
         let state = self.0.get(&kc);
         match state {
             Some(ks) => {
-                Some(!ks.was_pressed && ks.is_pressed)
+                !ks.was_pressed && ks.is_pressed
             }
-            None => None,
+            None => {
+                println!("Unknown keycode: {:#?}", kc);
+                false
+            },
         }
     }
 
-    pub fn just_released(&self, kc: KeyCode) -> Option<bool> {
+    pub fn just_released(&self, kc: KeyCode) -> bool {
         let state = self.0.get(&kc);
         match state {
             Some(ks) => {
-                Some(ks.was_pressed && !ks.is_pressed)
+                ks.was_pressed && !ks.is_pressed
             }
-            None => None,
+            None => {
+                println!("Unknown keycode: {:#?}", kc);
+                false
+            },
+        }
+    }
+
+    pub fn is_pressed(&self, kc: KeyCode) -> bool {
+        let state = self.0.get(&kc);
+        match state {
+            Some(ks) => {
+                ks.is_pressed
+            }
+            None => {
+                println!("Unknown keycode: {:#?}", kc);
+                false
+            },
         }
     }
     
-    pub fn reset(&mut self, pressed_key: Vec<KeyCode>) {
-        self.0.iter_mut().for_each(|(kc, state)| {
-            state.was_pressed = state.is_pressed;
-            state.is_pressed = pressed_key.contains(kc);
-        });
+    pub fn update(&mut self, kc: KeyCode, state: ButtonState) {
+        match self.0.get_mut(&kc) {
+            Some( 
+                val
+            ) => {
+                val.was_pressed = val.is_pressed;
+                val.is_pressed = state.is_pressed();
+            },
+            None => {
+                // nice weather huh?
+            }
+        }
     }
 }
 
 impl Default for KeyStateRes {
+
     fn default() -> Self {
         KeyStateRes(
             HashMap::from([
