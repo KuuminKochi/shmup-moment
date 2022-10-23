@@ -12,6 +12,12 @@ Moved the constants to their own .rs file.
 Still reworking on input parser; don't know if the new way of parsing will work as intended. But we'll see. [Refer to this](#Nt-2022/10/23-Dreamingtown-00).
 Also added this README because i can. Maybe it will be useful
 
+**Lg-2022/10/23-KuuminKochi**
+Working on the enemy bullet generator right now. Will have to reference this a lot:
+https://matthew-brett.github.io/teaching/rotation_2d.html
+While we're on the topic, i'll have to compose a little tune for the game, which I will reserve at a later time.
+Currently, I'm trying to figure out how to make the bullets shoot from all direction. I've already implemented the rotation 2D. It'll be a lil funky if it moves in the x-axis after being spawned
+
 ## Notes
 <a name="Nt-2022/10/23-Dreamingtown-00"></a>
 **Nt-2022/10/23-Dreamingtown-00**
@@ -23,6 +29,11 @@ Left this note in case something goes wrong related to the input parser
 - [ ] 0. Clean-up until i (dreamingtown) think it's good enough
 - [ ] 1. Test input parser
 - [ ] 2. Test collider system
+- [ ] 3. Make the bullets move relative to where they're spawned
+- [ ] 4. Add bullet curve
+- [ ] 5. Add bullet offsets (relative to the enemy)
+- [ ] 6. Add firerate
+- [ ] 7. Create spellcards
 
 ## README format
 ### Logs
