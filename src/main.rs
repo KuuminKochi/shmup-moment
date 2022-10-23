@@ -1,6 +1,7 @@
 use std::f32::consts::PI;
+use collision::CollisionPlugin;
 use constant::*;
-
+use test::*;
 // use external library
 use bevy::{
     prelude::*,
@@ -12,48 +13,47 @@ use bevy::{
 mod collision;
 mod controls;
 pub mod constant;
+pub mod test;
 
 // COMPONENTS
 
 #[derive(Component)]
-struct Player;
+pub struct Player;
 
 #[derive(Component)]
-struct PlayerStatus {
+pub struct PlayerStatus {
     is_dead: bool,
     is_shoot: bool,
     is_focus: bool,
 }
 
 #[derive(Component)]
-struct PlayerBullet;
+pub struct PlayerBullet;
 
 #[derive(Component)]
-struct BulletTimer(Timer);
+pub struct BulletTimer(Timer);
 
 #[derive(Component)]
-struct Enemy;
+pub struct Enemy;
 
 #[derive(Component)]
-struct EnemyStatus {
+pub struct EnemyStatus {
     is_dead: bool,
     is_shoot: bool,
 }
 
 #[derive(Component)]
-struct EnemyBullet;
-
-#[derive(Component)]
-struct Collider;
+pub struct EnemyBullet;
 
 #[derive(Default)]
-struct CollisionEvent;
+pub struct CollisionEvent;
 
 
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+    //    add_plugin(CollisionPlugin)
         .add_startup_system(setup)
         .add_startup_system(access_window_system)
         .add_startup_system(player_spawn)
@@ -110,7 +110,6 @@ fn player_spawn(mut commands: Commands) {
             ..default()
         })
         .insert(Player)
-        .insert(Collider)
         .insert(PlayerStatus {
             is_dead: false,
             is_shoot: false,
@@ -168,39 +167,6 @@ fn player_control(
     }
 }
 
-fn player_bullet_spawn(
-    mut commands: Commands,
-    player_state: Query<(&Transform, &PlayerStatus), With<Player>>,
-    time: Res<Time>,
-    mut timer: ResMut<BulletTimer>,
-) {
-    for (player_position, player_status) in player_state.iter() {
-        if player_status.is_shoot == true && timer.0.tick(time.delta()).just_finished() {
-            commands
-                .spawn()
-                .insert_bundle(SpriteBundle {
-                    sprite: Sprite {
-                        color: BULLET_COLOUR,
-                        ..default()
-                    },
-                    transform: Transform {
-                        translation: Vec3::new(
-                            player_position.translation.x,
-                            player_position.translation.y + 10.0,
-                            0.,
-                        ),
-                        scale: Vec3::new(BULLET_WIDTH, BULLET_HEIGHT, 0.),
-                        ..default()
-                    },
-                    ..default()
-                })
-                .insert(PlayerBullet)
-                .insert(Collider);
-
-            timer.0.reset();
-        }
-    }
-}
 
 fn player_bullet_move(mut bullet_state: Query<&mut Transform, With<PlayerBullet>>) {
     for mut bullet_position in bullet_state.iter_mut() {
@@ -208,28 +174,6 @@ fn player_bullet_move(mut bullet_state: Query<&mut Transform, With<PlayerBullet>
     }
 }
 
-fn enemy_spawn(mut commands: Commands) {
-    commands
-        .spawn()
-        .insert_bundle(SpriteBundle {
-            sprite: Sprite {
-                color: ENEMY_COLOUR,
-                ..default()
-            },
-            transform: Transform {
-                translation: Vec3::new(100., 0., 0.),
-                scale: Vec3::new(ENEMY_WIDTH, ENEMY_HEIGHT, 0.),
-                ..default()
-            },
-            ..default()
-        })
-        .insert(Enemy)
-        .insert(Collider)
-        .insert(EnemyStatus {
-            is_dead: false,
-            is_shoot: false,
-        });
-}
 
 fn check_for_collisions(
     mut commands: Commands,
