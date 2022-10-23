@@ -297,11 +297,12 @@ fn enemy_bullet_spawn(
         let bullet_curve: f32 = f32::powf(1.0, 2.0);
         let x_offset = 0.0;
         let y_offset = 0.0;
+        let degree = 60.0;
 
-        let bullet_x = enemy_transform.translation.x * bullet_curve + x_offset;
-        let bullet_y = enemy_transform.translation.y * bullet_curve + y_offset;
+        let bullet_x = f32::cos(degree * enemy_transform.translation.x) - f32::sin(degree * enemy_transform.translation.y);
+        let bullet_y = f32::sin(degree * enemy_transform.translation.x) + f32::sin(degree * enemy_transform.translation.y);
 
-        if enemy_status.is_shoot {
+        //if enemy_status.is_shoot {
             commands
                 .spawn()
                 .insert_bundle(SpriteBundle {
@@ -317,6 +318,6 @@ fn enemy_bullet_spawn(
                     ..default()
                 })
                 .insert(EnemyBullet);
-        }
+        //}
     }
 }
