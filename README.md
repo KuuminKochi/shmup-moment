@@ -23,6 +23,10 @@ Currently, I'm trying to figure out how to make the bullets shoot from all direc
 **Lg-2022/10/23-KuuminKochi-01**
 Added collision update, segregated some things like enemy spawning and player bullet spawn. Overall, the code is much cleaner now. drreamingtown is now a femboy
 
+<a name="Lg-2022/10/25-KuuminKochi-00"></a>
+**Lg-2022/10/25-KuuminKochi-01**
+Working on the math for the bullet hell patterns, over. No code but yes math
+
 ## Notes
 <a name="Nt-2022/10/23-Dreamingtown-00"></a>
 **Nt-2022/10/23-Dreamingtown-00**
